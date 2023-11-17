@@ -1,0 +1,123 @@
+body {
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    grid-template: 
+        "left_top    ....."  150px
+        "left_top    center" 1fr
+        "left_bottom center" 50px
+        "left_bottom ....."  150px
+    /    1fr         700px;
+    background-color: beige;
+    position: relative;
+}
+
+header {
+    grid-area: left_top;
+    display: flex;
+}
+
+header>img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+
+aside {
+    grid-area: left_bottom;
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    background-color: white;
+}
+
+aside>img {
+    width: auto;
+    height: 200px;
+}
+
+main {
+    grid-area: center;
+    display: flex;
+    flex-direction: column;
+}
+
+#room_add_div {
+    display: flex;
+    align-items: center;
+    height: 50px;
+}
+
+#room_label {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+    font-size: 30px;
+    margin: 0px 80px 0px 20px;
+}
+
+.btn_base {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+    border-radius: 10px;
+    border: none;
+    box-shadow: 3px 5px #001B24;
+    text-shadow: 1px 1px #CCE1DA;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn_base:hover {
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.btn_base:active {
+    box-shadow: none;
+    transform: translate(3px, 5px);
+}
+
+#room_add_btn {
+    width: 200px;
+    height: 40px;
+    font-size: 28px;
+    background-color: #25D195;
+    color: #001B24;
+}
+
+#room_list {
+    min-height: 300px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: 90%;
+    margin: 50px 10px 10px 40px;
+}
+
+.room_item {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+    box-shadow: -3px 5px #001B24;
+    text-shadow: 1px 1px #CCE1DA;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    width: fit-content;
+    max-width: 85%;
+    padding: 0px 60px 0px 20px;
+    height: 50px;
+    margin: 0px 0px 30px 5px;
+    font-size: 36px;
+    color: #001B24;
+    overflow: hidden;
+}
+
+.room_item:hover {
+    cursor: pointer;
+    background-color: #001B24;
+    color: beige;
+}
+
+.room_item:active {
+    box-shadow: none;
+    transform: translate(-3px, 5px);
+}
