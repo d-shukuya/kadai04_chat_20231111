@@ -12,7 +12,7 @@ import {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const dbRef = ref(db, "chatRoom");
+const dbRef = ref(db, "whiteboardChat");
 
 // 新しい Room の追加
 $("#room_add_btn").on("click", function () {
