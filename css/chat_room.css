@@ -171,6 +171,11 @@ nav button:active {
     margin: 0px 10px 0px 0px;
 }
 
+#back_board_display {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 20px;
+}
+
 main {
     grid-area: center;
     position: relative;
@@ -196,9 +201,27 @@ main {
     border-radius: 20px;
 }
 
-#draw_area {
+#editing_board_div {
     position: absolute;
     z-index: 2;
+    width: 1350px;
+    height: 650px;
+    border: 10px double #001B24;
+    border-radius: 30px;
+    top: 20px;
+    left: 10px;
+}
+
+.editing_board {
+    position: absolute;
+    width: 1350px;
+    height: 650px;
+    border-radius: 20px;
+}
+
+#draw_area {
+    position: absolute;
+    z-index: 3;
     border-radius: 20px;
     top: 30px;
     left: 20px;

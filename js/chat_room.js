@@ -5,7 +5,6 @@ import {
   ref,
   push,
   set,
-  get,
   onChildAdded,
   remove,
   onChildRemoved,
@@ -17,11 +16,14 @@ const urlParams = new URLSearchParams(window.location.search);
 const roomKey = urlParams.get("roomKey");
 
 // firebase の変数設定
+let thisTabId;
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 let roomRef = ref(db, `whiteboardChat/${roomKey}`);
 let roomNameRef = ref(db, `whiteboardChat/${roomKey}/roomName`);
 let committedBoardRef = ref(db, `whiteboardChat/${roomKey}/committedBoard`);
+let editingBoardRef = ref(db, `whiteboardChat/${roomKey}/editingBoard`);
+let myEditingBoardRef;
 let chatRef = ref(db, `whiteboardChat/${roomKey}/chat`);
 
 // canvas の記述
@@ -31,6 +33,8 @@ let oldX = 0;
 let oldY = 0;
 let lineWidth = 3;
 let lineColor = "#000000";
+let backBoardDisplay = "opacity";
+const backBoardDisplayOption = { display: 1.0, opacity: 0.2, none: 0.0 };
 
 // canvas の初期設定
 // ユーザーが描画する canvas
@@ -77,12 +81,25 @@ $(canvas).on("mousemove", function (e) {
 // マウスアップイベント
 $(canvas).on("mouseup", function () {
   canWrite = false;
+  setMyEditingBoard();
 });
 
 // マウスアウトイベント
 $(canvas).on("mouseout", function () {
+  if (!canWrite) return;
   canWrite = false;
+  setMyEditingBoard();
 });
+
+// 編集中の canvas を firebase に保存
+function setMyEditingBoard() {
+  set(myEditingBoardRef, { 0: canvas.toDataURL() });
+}
+
+// 編集中の canvas を firebase から削除
+function removeMyEditingBoard() {
+  remove(myEditingBoardRef);
+}
 
 // 線の色変更イベント
 $("#line_color").on("change", function () {
@@ -95,16 +112,46 @@ $("#line_width").on("change", function () {
   $("#line_width_text").html(`${lineWidth} px`);
 });
 
+// 背景変更イベント
+$("#back_board_display").on("change", function () {
+  backBoardDisplay = $(this).val();
+  const cBoard = $("#committed_board");
+  const eBoard = $(".editing_board");
+  switch (backBoardDisplay) {
+    case "display":
+      cBoard.css({ opacity: 1.0 });
+      eBoard.css({ opacity: 1.0 });
+      break;
+    case "opacity":
+      cBoard.css({ opacity: 0.1 });
+      eBoard.css({ opacity: 0.1 });
+      break;
+    case "none":
+      cBoard.css({ opacity: 0.0 });
+      eBoard.css({ opacity: 0.0 });
+      break;
+    default:
+      break;
+  }
+});
+
 // クリアボタン処理
 $("#clear_btn").on("click", function () {
   const result = confirm("書いた内容をクリアしますか？");
   if (!result) return;
   ctx.beginPath();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  removeMyEditingBoard();
 });
 
 // 投稿ボタン処理
 $("#send_btn").on("click", function () {
+  const accountName = $("#account_name").val();
+  if (accountName == "") {
+    alert("AccountName を入力してから投稿してください。");
+    return;
+  }
+
   // committedBoard へ反映
   // committedBoard を canvas 化
   ctxCommitted.drawImage(committedImg[0], 0, 0, canvasCommitted.width, canvasCommitted.height);
@@ -113,16 +160,21 @@ $("#send_btn").on("click", function () {
   ctxTemp.drawImage(canvasCommitted, 0, 0);
   ctxTemp.drawImage(canvas, 0, 0);
 
-  // firebase に保存
+  // firebase の更新
   set(committedBoardRef, { 0: canvasTemp.toDataURL() });
+  removeMyEditingBoard();
 
   // chat に反映
   const date = new Date();
+  const yyyy = date.getFullYear().toString().padStart(4, "0");
+  const MM = (date.getMonth() + 1).toString().padStart(2, "0");
+  const dd = date.getDate().toString().padStart(2, "0");
+  const hh = date.getHours().toString().padStart(2, "0");
+  const mm = date.getMinutes().toString().padStart(2, "0");
+  const ss = date.getSeconds().toString().padStart(2, "0");
   const chatVal = {
     writer: $("#account_name").val(),
-    createdDate: `${date.getFullYear()}/${
-      date.getMonth() + 1
-    }/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`,
+    createdDate: `${yyyy}/${MM}/${dd}　${hh}:${mm}:${ss}`,
     img: canvas.toDataURL(),
   };
   const newPastRef = push(chatRef);
@@ -147,20 +199,32 @@ $(window).on("load", function () {
   // 初期値のセット
   $("#line_width_text").html(`${lineWidth} px`);
   $("#line_width").val("3");
-
-  // get(roomNameRef)
-  //   .then((data) => {
-  //     if (data.exists()) {
-  //       thisChatRoom = new ChatRoom(roomKey, data.val());
-  //       $(`#${data.key}`).html(thisChatRoom.RoomName);
-  //     } else {
-  //       console.error("読み込みエラー。該当データがありません。元ページから再度遷移してください。");
-  //     }
-  //   })
-  //   .catch((err) => {
-  //     console.error(err);
-  //   });
+  $("#back_board_display").val(backBoardDisplay);
+  thisTabId = generateRandomString(20);
+  myEditingBoardRef = ref(
+    db,
+    `whiteboardChat/${roomKey}/editingBoard/${getMyEditingBoardKey(thisTabId)}`
+  );
 });
+
+// クローズ時の処理
+$(window).on("beforeunload", function () {
+  removeMyEditingBoard();
+});
+
+// 20桁の乱数の作成
+function generateRandomString(length) {
+  var chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  var result = "";
+  for (var i = 0; i < length; i++) {
+    result += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return result;
+}
+
+function getMyEditingBoardKey(id) {
+  return `eBoard-${id}`;
+}
 
 // ロゴ画像押下時、TOP画面へ遷移
 $("header>img").on("click", function () {
@@ -215,10 +279,32 @@ onChildChanged(committedBoardRef, function (data) {
 });
 
 const loadCommittedImg = function (src) {
-  committedImg.attr("src", src);
+  committedImg.attr("src", src).css({ opacity: backBoardDisplayOption[backBoardDisplay] });
   $("#committed_board_div").empty();
   $("#committed_board_div").append(committedImg);
 };
+
+// editingBoard
+onChildAdded(editingBoardRef, function (data) {
+  const key = data.key;
+  if (key == getMyEditingBoardKey(thisTabId)) return;
+  const editingImg = $(`<img />`)
+    .attr({ id: key, class: "editing_board", src: data.val()[0] })
+    .css({ opacity: backBoardDisplayOption[backBoardDisplay] });
+  $("#editing_board_div").append(editingImg);
+});
+
+onChildRemoved(editingBoardRef, function (data) {
+  const key = data.key;
+  if (key == getMyEditingBoardKey(thisTabId)) return;
+  $(`#${key}`).remove();
+});
+
+onChildChanged(editingBoardRef, function (data) {
+  const key = data.key;
+  if (key == getMyEditingBoardKey(thisTabId)) return;
+  $(`#${key}`).attr("src", data.val()[0]);
+});
 
 // chat
 onChildAdded(chatRef, function (data) {
@@ -231,7 +317,7 @@ onChildAdded(chatRef, function (data) {
       <img src="${val.img}" alt="" class="chat_item_img">
   </div>
   `;
-  $("#chat_list").append(html);
+  $("#chat_list").prepend(html);
 });
 
 onChildRemoved(chatRef, function (data) {

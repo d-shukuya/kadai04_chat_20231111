@@ -37,10 +37,18 @@
         <input type="range" id="line_width" min="0.5" max="50" step="0.5">
         <p id="line_width_text" class="label_base"></p>
       </div>
+      <div>
+        <label class="label_base" for="back_board_display">背景: </label>
+        <select name="" id="back_board_display">
+          <option value="display">表示</option>
+          <option value="opacity">透過</option>
+          <option value="none">非表示</option>
+        </select>
+      </div>
     </nav>
     <main>
-      <div id="committed_board_div">
-      </div>
+      <div id="committed_board_div"></div>
+      <div id="editing_board_div"></div>
       <canvas id="draw_area" width="1350" height="650"></canvas>
     </main>
     <aside>
