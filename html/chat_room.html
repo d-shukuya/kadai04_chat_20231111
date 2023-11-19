@@ -14,7 +14,10 @@
     </header>
     <div id="account_div">
       <div id="chat_room_name_div">
-        <label class="label_base" for="room_name">ChatRoomName: </label>
+        <div>
+          <label class="label_base" for="room_name">ChatRoomName: </label>
+          <button id="delete_room_btn">Room削除</button>
+        </div>       
         <h1 id="room_name" contenteditable="true"></h1>
       </div>
       <div id="account_name_div">
@@ -36,12 +39,13 @@
       </div>
     </nav>
     <main>
-      <div id="shared_board_div">
-        <!-- <img id="shared_board" src="" alt=""> -->
+      <div id="committed_board_div">
       </div>
       <canvas id="draw_area" width="1350" height="650"></canvas>
     </main>
-    <aside></aside>
+    <aside>
+      <ul id="chat_list"></ul>
+    </aside>
 
     <!-- スクリプト読込 -->
     <script src="../js/jquery-2.1.3.min.js"></script>

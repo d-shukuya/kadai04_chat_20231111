@@ -48,9 +48,34 @@ header>img:hover {
     font-size: 20px;
 }
 
-#chat_room_name_div>label {
-    align-self: flex-end;
-    margin: 0px 0px 15px 0px;
+#chat_room_name_div>div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#chat_room_name_div button {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    width: fit-content;
+    height: 30px;
+    font-size: 20px;
+    border-radius: 5px;
+    box-shadow: 3px 5px #001B24;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #001B24;
+    font-weight: bold;
+    margin: 5px 0px 0px 0px;
+}
+
+#chat_room_name_div button:hover {
+    cursor: pointer;
+}
+
+#chat_room_name_div button:active {
+    box-shadow: none;
+    transform: translate(3px, 5px);
 }
 
 #chat_room_name_div>h1 {
@@ -113,7 +138,7 @@ nav label {
     margin: 0px 10px 0px 0px;
 }
 
-button {
+nav button {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     width: 90px;
     height: 35px;
@@ -128,11 +153,11 @@ button {
     margin: 0px 20px 0px 0px;
 }
 
-button:hover {
+nav button:hover {
     cursor: pointer;
 }
 
-button:active {
+nav button:active {
     box-shadow: none;
     transform: translate(3px, 5px);
 }
@@ -152,7 +177,7 @@ main {
     z-index: 0;
 }
 
-#shared_board_div {
+#committed_board_div {
     position: absolute;
     z-index: 1;
     width: 1350px;
@@ -164,7 +189,7 @@ main {
     background: white;
 }
 
-#shared_board {
+#committed_board {
     position: absolute;
     width: 1350px;
     height: 650px;
@@ -181,7 +206,46 @@ main {
 
 aside {
     grid-area: right;
-    min-width: 450px;
-    /* background: beige; */
+    min-width: 400px;
+    position: relative;
 }
 
+#chat_list {
+    position: absolute;
+    width: 450px;
+    height: 660px;
+    top: 25px;
+    left: 10px;
+    overflow: auto;
+}
+
+.chat_item {
+    width: 420px;
+    height: 270px;
+    background: #f8e2b7;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    margin: 0px 0px 10px 0px;
+}
+
+.chat_item_name {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+    font-size: 20px;
+    margin: 10px 5px 5px 10px;
+}
+
+.chat_item_date {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 18px;
+    margin: 5px 5px 10px 10px;
+}
+
+.chat_item_img {
+    width: 380px;
+    height: auto;
+    align-self: center;
+    background: white;
+}
