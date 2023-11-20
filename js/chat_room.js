@@ -37,6 +37,7 @@ let lineWidth = 3;
 let lineColor = "#000000";
 let backBoardDisplay = "opacity";
 const backBoardDisplayOption = { display: 1.0, opacity: 0.2, none: 0.0 };
+let mousemoveEventDelayTime = 300; //ポインタをトラックする間隔
 
 // canvas の初期設定
 // ユーザーが描画する canvas
@@ -64,7 +65,6 @@ $(canvas).on("mousedown", function (e) {
 
 // マウスムーブイベント
 let lastMousemoveEventTime = 0;
-let delay = 300;
 $(canvas).on("mousemove", function (e) {
   const px = e.offsetX;
   const py = e.offsetY;
@@ -82,10 +82,8 @@ $(canvas).on("mousemove", function (e) {
   }
 
   let currentTime = Date.now();
-  if (currentTime - lastMousemoveEventTime >= delay) {
+  if (currentTime - lastMousemoveEventTime >= mousemoveEventDelayTime) {
     set(myPointerRef, { pointerName: $("#account_name").val(), pointerX: px, pointerY: py });
-    // const ptr = $("#test_pointer");
-    // ptr.css({ top: py, left: px - 50 });
     lastMousemoveEventTime = currentTime;
   }
 });
