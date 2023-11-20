@@ -25,6 +25,8 @@ let committedBoardRef = ref(db, `whiteboardChat/${roomKey}/committedBoard`);
 let editingBoardRef = ref(db, `whiteboardChat/${roomKey}/editingBoard`);
 let myEditingBoardRef;
 let chatRef = ref(db, `whiteboardChat/${roomKey}/chat`);
+let pointerRef = ref(db, `whiteboardChat/${roomKey}/pointer`);
+let myPointerRef;
 
 // canvas の記述
 // canvas の変数設定
@@ -61,10 +63,12 @@ $(canvas).on("mousedown", function (e) {
 });
 
 // マウスムーブイベント
+let lastMousemoveEventTime = 0;
+let delay = 300;
 $(canvas).on("mousemove", function (e) {
+  const px = e.offsetX;
+  const py = e.offsetY;
   if (canWrite) {
-    const px = e.offsetX;
-    const py = e.offsetY;
     ctx.strokeStyle = lineColor;
     ctx.lineWidth = lineWidth;
     ctx.beginPath();
@@ -75,6 +79,14 @@ $(canvas).on("mousemove", function (e) {
     ctx.stroke();
     oldX = px;
     oldY = py;
+  }
+
+  let currentTime = Date.now();
+  if (currentTime - lastMousemoveEventTime >= delay) {
+    set(myPointerRef, { pointerName: $("#account_name").val(), pointerX: px, pointerY: py });
+    // const ptr = $("#test_pointer");
+    // ptr.css({ top: py, left: px - 50 });
+    lastMousemoveEventTime = currentTime;
   }
 });
 
@@ -205,11 +217,13 @@ $(window).on("load", function () {
     db,
     `whiteboardChat/${roomKey}/editingBoard/${getMyEditingBoardKey(thisTabId)}`
   );
+  myPointerRef = ref(db, `whiteboardChat/${roomKey}/pointer/${getMyPointerKey(thisTabId)}`);
 });
 
 // クローズ時の処理
 $(window).on("beforeunload", function () {
   removeMyEditingBoard();
+  remove(myPointerRef);
 });
 
 // 20桁の乱数の作成
@@ -224,6 +238,10 @@ function generateRandomString(length) {
 
 function getMyEditingBoardKey(id) {
   return `eBoard-${id}`;
+}
+
+function getMyPointerKey(id) {
+  return `ptr-${id}`;
 }
 
 // ロゴ画像押下時、TOP画面へ遷移
@@ -332,4 +350,37 @@ onChildChanged(chatRef, function (data) {
     <img src="${val.img}" alt="" class="chat_item_img">
   `;
   $(`#${data.key}`).html(html);
+});
+
+// pointer
+let pointerColorNum = 1;
+onChildAdded(pointerRef, function (data) {
+  const key = data.key;
+  const val = data.val();
+  if (key == getMyPointerKey(thisTabId)) return;
+  let ptr = $("<div />")
+    .attr({ id: key, class: "pointer" })
+    .css({ top: val.pointerY, left: val.pointerX - 50 });
+  let html = `
+    <img src="../img/pointer_${pointerColorNum}.png" alt="">
+    <label for="pointer">${val.pointerName}</label>
+  `;
+  ptr.append(html);
+  $("#pointer_div").append(ptr);
+  if (pointerColorNum == 8) {
+    pointerColorNum = 1;
+  } else {
+    pointerColorNum++;
+  }
+});
+
+onChildRemoved(pointerRef, function (data) {
+  $(`#${data.key}`).remove();
+});
+
+onChildChanged(pointerRef, function (data) {
+  const key = data.key;
+  const val = data.val();
+  $(`#${key}>label`).html(val.pointerName);
+  $(`#${key}`).css({ top: val.pointerY, left: val.pointerX - 50 });
 });

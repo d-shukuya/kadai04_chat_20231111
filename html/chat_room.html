@@ -17,12 +17,12 @@
         <div>
           <label class="label_base" for="room_name">ChatRoomName: </label>
           <button id="delete_room_btn">Room削除</button>
-        </div>       
+        </div>
         <h1 id="room_name" contenteditable="true"></h1>
       </div>
       <div id="account_name_div">
         <label class="label_base" for="account_name">AccountName:</label>
-        <input type="text" name="account_name" id="account_name">
+        <input type="text" name="account_name" id="account_name" />
       </div>
     </div>
     <nav>
@@ -30,11 +30,11 @@
       <button id="clear_btn">クリア</button>
       <div>
         <label class="label_base" for="line_color">線の色: </label>
-        <input type="color" id="line_color">
+        <input type="color" id="line_color" />
       </div>
       <div>
         <label class="label_base" for="line_width">線の太さ: </label>
-        <input type="range" id="line_width" min="0.5" max="50" step="0.5">
+        <input type="range" id="line_width" min="0.5" max="50" step="0.5" />
         <p id="line_width_text" class="label_base"></p>
       </div>
       <div>
@@ -50,6 +50,7 @@
       <div id="committed_board_div"></div>
       <div id="editing_board_div"></div>
       <canvas id="draw_area" width="1350" height="650"></canvas>
+      <div id="pointer_div"></div>
     </main>
     <aside>
       <ul id="chat_list"></ul>
