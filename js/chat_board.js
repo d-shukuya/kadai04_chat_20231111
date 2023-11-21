@@ -11,21 +11,21 @@ import {
   onChildChanged,
 } from "https://www.gstatic.com/firebasejs/9.1.1/firebase-database.js";
 
-// roomKey の パース
+// boardKey の パース
 const urlParams = new URLSearchParams(window.location.search);
-const roomKey = urlParams.get("roomKey");
+const boardKey = urlParams.get("boardKey");
 
 // firebase の変数設定
 let thisTabId;
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-let roomRef = ref(db, `whiteboardChat/${roomKey}`);
-let roomNameRef = ref(db, `whiteboardChat/${roomKey}/roomName`);
-let committedBoardRef = ref(db, `whiteboardChat/${roomKey}/committedBoard`);
-let editingBoardRef = ref(db, `whiteboardChat/${roomKey}/editingBoard`);
+let boardRef = ref(db, `whiteboardChat/${boardKey}`);
+let boardNameRef = ref(db, `whiteboardChat/${boardKey}/boardName`);
+let committedBoardRef = ref(db, `whiteboardChat/${boardKey}/committedBoard`);
+let editingBoardRef = ref(db, `whiteboardChat/${boardKey}/editingBoard`);
 let myEditingBoardRef;
-let chatRef = ref(db, `whiteboardChat/${roomKey}/chat`);
-let pointerRef = ref(db, `whiteboardChat/${roomKey}/pointer`);
+let chatRef = ref(db, `whiteboardChat/${boardKey}/chat`);
+let pointerRef = ref(db, `whiteboardChat/${boardKey}/pointer`);
 let myPointerRef;
 
 // canvas の記述
@@ -201,8 +201,8 @@ $("#send_btn").on("click", function () {
 
 // ロード時の処理
 $(window).on("load", function () {
-  if (roomKey == null) {
-    alert("ChatRoomのデータが見つかりません。TOPへ戻ります。");
+  if (boardKey == null) {
+    alert("ChatBoardのデータが見つかりません。TOPへ戻ります。");
     window.location.href = "../index.html";
   }
 
@@ -213,9 +213,9 @@ $(window).on("load", function () {
   thisTabId = generateRandomString(20);
   myEditingBoardRef = ref(
     db,
-    `whiteboardChat/${roomKey}/editingBoard/${getMyEditingBoardKey(thisTabId)}`
+    `whiteboardChat/${boardKey}/editingBoard/${getMyEditingBoardKey(thisTabId)}`
   );
-  myPointerRef = ref(db, `whiteboardChat/${roomKey}/pointer/${getMyPointerKey(thisTabId)}`);
+  myPointerRef = ref(db, `whiteboardChat/${boardKey}/pointer/${getMyPointerKey(thisTabId)}`);
 });
 
 // クローズ時の処理
@@ -247,37 +247,37 @@ $("header>img").on("click", function () {
   window.location.href = "../index.html";
 });
 
-// Room削除ボタン
+// Board削除ボタン
 let isDeleted = false;
-$("#delete_room_btn").on("click", function () {
+$("#delete_board_btn").on("click", function () {
   // 1. 警告
-  const result = confirm("この ChatRoom を本当に削除しますか？");
+  const result = confirm("この ChatBoard を本当に削除しますか？");
   if (!result) return;
   isDeleted = true;
-  remove(roomRef);
+  remove(boardRef);
   window.location.href = "../index.html";
 });
 
-// ChatRoomName の変更後にフォーカスが外れたときの処理
-$("#room_name").on("blur", function () {
-  set(roomNameRef, { 0: $(this).text() });
+// ChatBoardName の変更後にフォーカスが外れたときの処理
+$("#board_name").on("blur", function () {
+  set(boardNameRef, { 0: $(this).text() });
 });
 
 // firebase の監視処理
-//ChatRoomName
-onChildAdded(roomNameRef, function (data) {
-  $("#room_name").html(data.val());
+//ChatBoardName
+onChildAdded(boardNameRef, function (data) {
+  $("#board_name").html(data.val());
 });
 
-onChildRemoved(roomNameRef, function () {
+onChildRemoved(boardNameRef, function () {
   if (!isDeleted) {
-    alert("ChatRoomのデータが見つかりません。TOPへ戻ります。");
+    alert("ChatBoardのデータが見つかりません。TOPへ戻ります。");
     window.location.href = "../index.html";
   }
 });
 
-onChildChanged(roomNameRef, function (data) {
-  $("#room_name").html(data.val());
+onChildChanged(boardNameRef, function (data) {
+  $("#board_name").html(data.val());
 });
 
 // committedBoard

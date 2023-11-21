@@ -14,10 +14,10 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const dbRef = ref(db, "whiteboardChat");
 
-// 新しい Room の追加
-$("#room_add_btn").on("click", function () {
+// 新しい Board の追加
+$("#board_add_btn").on("click", function () {
   const val = {
-    roomName: { 0: "NewChatRoom"},
+    boardName: { 0: "NewChatBoard"},
   };
   const newPostRef = push(dbRef);
   set(newPostRef, val);
@@ -29,12 +29,12 @@ onChildAdded(dbRef, function (data) {
   const key = data.key;
 
   let html = `
-        <li id="${key}" class="room_item">
-            ${val.roomName[0]}
+        <li id="${key}" class="board_item">
+            ${val.boardName[0]}
         </li>
     `;
 
-  $("#room_list").append(html);
+  $("#board_list").append(html);
 });
 
 onChildRemoved(dbRef, function (data) {
@@ -42,11 +42,11 @@ onChildRemoved(dbRef, function (data) {
 });
 
 onChildChanged(dbRef, function (data) {
-  $(`#${data.key}`).html(data.val().roomName);
+  $(`#${data.key}`).html(data.val().boardName);
 });
 
-$("#room_list").on("click", ".room_item", function () {
-  window.location.href = `./html/chat_room.html?roomKey=${this.id}`;
+$("#board_list").on("click", ".board_item", function () {
+  window.location.href = `./html/chat_board.html?boardKey=${this.id}`;
 });
 
 // 関数

@@ -43,13 +43,13 @@ main {
     flex-direction: column;
 }
 
-#room_add_div {
+#board_add_div {
     display: flex;
     align-items: center;
     height: 50px;
 }
 
-#room_label {
+#board_label {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-weight: bold;
     font-size: 30px;
@@ -80,7 +80,7 @@ main {
     transform: translate(3px, 5px);
 }
 
-#room_add_btn {
+#board_add_btn {
     width: 200px;
     height: 40px;
     font-size: 28px;
@@ -88,7 +88,7 @@ main {
     color: #001B24;
 }
 
-#room_list {
+#board_list {
     min-height: 300px;
     overflow-x: hidden;
     overflow-y: auto;
@@ -96,7 +96,7 @@ main {
     margin: 50px 10px 10px 40px;
 }
 
-.room_item {
+.board_item {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-weight: bold;
     box-shadow: 3px 5px white;
@@ -116,13 +116,13 @@ main {
     border-radius: 10px;
 }
 
-.room_item:hover {
+.board_item:hover {
     cursor: pointer;
     background-color: #001B24;
     color: beige;
 }
 
-.room_item:active {
+.board_item:active {
     box-shadow: none;
     transform: translate(3px, 5px);
 }
