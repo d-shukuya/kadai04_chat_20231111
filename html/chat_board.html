@@ -38,6 +38,20 @@
         <p id="line_width_text" class="label_base"></p>
       </div>
       <div>
+        <label class="label_base" for="stamp_list">スタンプ: </label>
+        <select name="" id="stamp_size">
+          <option value="stamp_size_s">小</option>
+          <option value="stamp_size_m">中</option>
+          <option value="stamp_size_l">大</option>
+        </select>
+        <select name="" id="stamp_list">
+          <option value="gs_logo.png">gs_logo</option>
+          <option value="hanpanai.png">hanpanai</option>
+          <option value="akumateki.png">akumateki</option>
+        </select>
+        <button id="stamp_btn"></button>
+      </div>
+      <div>
         <label class="label_base" for="back_board_display">背景: </label>
         <select name="" id="back_board_display">
           <option value="display">表示</option>
@@ -50,6 +64,7 @@
       <div id="committed_board_div"></div>
       <div id="editing_board_div"></div>
       <canvas id="draw_area" width="1350" height="650"></canvas>
+      <div id="stamp_board_div"></div>
       <div id="pointer_div"></div>
     </main>
     <aside>

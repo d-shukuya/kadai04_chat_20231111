@@ -31,6 +31,8 @@ let myPointerRef;
 // canvas の記述
 // canvas の変数設定
 let canWrite = false;
+let isStampMode = false;
+let canDrawStamp = false;
 let oldX = 0;
 let oldY = 0;
 let lineWidth = 3;
@@ -38,6 +40,8 @@ let lineColor = "#000000";
 let backBoardDisplay = "opacity";
 const backBoardDisplayOption = { display: 1.0, opacity: 0.2, none: 0.0 };
 let mousemoveEventDelayTime = 300; //ポインタをトラックする間隔
+let drawStampDelayTime = 100; //ポインタをトラックする間隔
+const stampSizeToPx = { stamp_size_s: 30, stamp_size_m: 60, stamp_size_l: 200 };
 
 // canvas の初期設定
 // ユーザーが描画する canvas
@@ -58,13 +62,39 @@ const ctxTemp = canvasTemp.getContext("2d");
 
 // マウスダウンイベント
 $(canvas).on("mousedown", function (e) {
-  oldX = e.offsetX;
-  oldY = e.offsetY;
-  canWrite = true;
+  if (isStampMode) {
+    // スタンプ挿入
+    putStamp(e);
+    canDrawStamp = true;
+  } else {
+    oldX = e.offsetX;
+    oldY = e.offsetY;
+    canWrite = true;
+  }
 });
+
+function putStamp(event) {
+  const stampSizeClass = $("#stamp_size").val();
+  const stampSize = stampSizeToPx[stampSizeClass];
+  const x = event.offsetX - stampSize / 2;
+  const y = event.offsetY - stampSize / 2;
+
+  const img = $("<img />").attr({
+    src: `../img/stamp/${$("#stamp_list").val()}`,
+    "data-size": stampSize,
+    "data-top": y,
+    "data-left": x,
+  });
+  const div = $("<div />")
+    .attr({ class: `stamp ${stampSizeClass}` })
+    .css({ top: y, left: x })
+    .append(img);
+  $("#stamp_board_div").append(div);
+}
 
 // マウスムーブイベント
 let lastMousemoveEventTime = 0;
+let lastDrawStampTime = 0;
 $(canvas).on("mousemove", function (e) {
   const px = e.offsetX;
   const py = e.offsetY;
@@ -82,6 +112,14 @@ $(canvas).on("mousemove", function (e) {
   }
 
   let currentTime = Date.now();
+
+  if (isStampMode && canDrawStamp) {
+    if (currentTime - lastDrawStampTime >= drawStampDelayTime) {
+      putStamp(e);
+      lastDrawStampTime = currentTime;
+    }
+  }
+
   if (currentTime - lastMousemoveEventTime >= mousemoveEventDelayTime) {
     set(myPointerRef, { pointerName: $("#account_name").val(), pointerX: px, pointerY: py });
     lastMousemoveEventTime = currentTime;
@@ -90,20 +128,46 @@ $(canvas).on("mousemove", function (e) {
 
 // マウスアップイベント
 $(canvas).on("mouseup", function () {
-  canWrite = false;
-  setMyEditingBoard();
+  drawEnd();
 });
 
 // マウスアウトイベント
 $(canvas).on("mouseout", function () {
-  if (!canWrite) return;
-  canWrite = false;
-  setMyEditingBoard();
+  drawEnd();
 });
+
+function drawEnd() {
+  if (canWrite) {
+    canWrite = false;
+  }
+
+  if (canDrawStamp) {
+    canDrawStamp = false;
+    setStampToCanvas();
+  }
+
+  setMyEditingBoard();
+}
 
 // 編集中の canvas を firebase に保存
 function setMyEditingBoard() {
   set(myEditingBoardRef, { 0: canvas.toDataURL() });
+}
+
+function setStampToCanvas() {
+  // stamp を EditingBoard に反映
+  const stamps = $("#stamp_board_div img");
+  stamps.each(function() {
+    const element = $(this);
+    ctx.drawImage(
+      element[0],
+      element.data("left"),
+      element.data("top"),
+      element.data("size"),
+      element.data("size")
+    );
+  });
+  $("#stamp_board_div").empty();
 }
 
 // 編集中の canvas を firebase から削除
@@ -142,6 +206,28 @@ $("#back_board_display").on("change", function () {
       break;
     default:
       break;
+  }
+});
+
+// スタンプ挿入ボタン処理
+$("#stamp_btn").on("click", function () {
+  if (isStampMode) {
+    $(this).html("挿入");
+    isStampMode = false;
+    $(canvas).css("cursor", "default");
+  } else {
+    $(this).html("解除");
+    isStampMode = true;
+    $(canvas).css("cursor", "crosshair");
+  }
+});
+
+// 「esc」ボタン押下時の処理
+$(document).on("keydown", function (event) {
+  if (event.key == "Escape") {
+    $(canvas).css("cursor", "default");
+    $("#stamp_btn").html("挿入");
+    isStampMode = false;
   }
 });
 
@@ -216,6 +302,9 @@ $(window).on("load", function () {
     `whiteboardChat/${boardKey}/editingBoard/${getMyEditingBoardKey(thisTabId)}`
   );
   myPointerRef = ref(db, `whiteboardChat/${boardKey}/pointer/${getMyPointerKey(thisTabId)}`);
+
+  $("#stamp_btn").html("挿入");
+  isStampMode = false;
 });
 
 // クローズ時の処理
